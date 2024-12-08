@@ -6,7 +6,7 @@ part of 'wareki.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$warekiHash() => r'73c5670590db8268a0f1866d520220438bf1c20c';
+String _$warekiHash() => r'bba1bfeb43d77183ac456dc4632395e49195b86c';
 
 /// Copied from Dart SDK
 class _SystemHash {

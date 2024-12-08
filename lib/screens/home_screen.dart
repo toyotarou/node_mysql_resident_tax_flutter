@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../controllers/resident_tax/resident_tax.dart';
 import '../controllers/wareki/wareki.dart';
 import '../extensions/extensions.dart';
+import '../models/resident_tax_model.dart';
 import '../models/wareki_model.dart';
 import '../utility/utility.dart';
 
@@ -25,8 +27,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   ///
   @override
+  void initState() {
+    super.initState();
+
+    ref.read(residentTaxProvider.notifier).getAllResidentTax();
+  }
+
+  ///
+  @override
   Widget build(BuildContext context) {
     makeWarekiMap();
+
+    final Map<String, ResidentTaxModel> residentTaxMap =
+        ref.watch(residentTaxProvider.select((ResidentTaxState value) => value.residentTaxMap));
+
+    print(residentTaxMap);
 
     return Scaffold(
       body: SafeArea(
