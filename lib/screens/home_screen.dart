@@ -7,6 +7,8 @@ import '../extensions/extensions.dart';
 import '../models/resident_tax_model.dart';
 import '../models/wareki_model.dart';
 import '../utility/utility.dart';
+import 'components/resident_tax_input_alert.dart';
+import 'parts/resident_tax_dialog.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -85,9 +87,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   child: GestureDetector(
                     onTap: tapOk
                         ? () {
-                            print(payLimit);
-                            print(warekiMap[i]);
-                            print(index + 1);
+                            ResidentTaxDialog(
+                              context: context,
+                              widget: ResidentTaxInputAlert(
+                                payLimit: payLimit,
+                                wareki: warekiMap[i] ?? '',
+                                index: index + 1,
+                                data: residentTaxMap['${warekiMap[i]}-${index + 1}'],
+                              ),
+                            );
                           }
                         : null,
                     child: Container(
@@ -104,27 +112,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           children: <Widget>[
                             const Text('limit:'),
                             Text(payLimit),
-                            if (warekiMap[i] != null && residentTaxMap['${warekiMap[i]}-$index'] != null) ...<Widget>[
+                            if (warekiMap[i] != null &&
+                                residentTaxMap['${warekiMap[i]}-${index + 1}'] != null) ...<Widget>[
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: <Widget>[
                                   Container(),
-                                  Text(residentTaxMap['${warekiMap[i]}-$index']!.price.toString().toCurrency()),
+                                  Text(residentTaxMap['${warekiMap[i]}-${index + 1}']!.price.toString().toCurrency()),
                                 ],
                               ),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: <Widget>[
                                   Container(),
-                                  Text((residentTaxMap['${warekiMap[i]}-$index']!.payDate != null)
-                                      ? residentTaxMap['${warekiMap[i]}-$index']!.payDate.toString()
+                                  Text((residentTaxMap['${warekiMap[i]}-${index + 1}']!.payDate != null)
+                                      ? residentTaxMap['${warekiMap[i]}-${index + 1}']!.payDate.toString()
                                       : '-'),
                                 ],
                               ),
-                              if (residentTaxMap['${warekiMap[i]}-$index']!.interestPayDate != null &&
-                                  residentTaxMap['${warekiMap[i]}-$index']!.interestPrice != null) ...<Widget>[
-                                Text(residentTaxMap['${warekiMap[i]}-$index']!.interestPayDate.toString()),
-                                Text(residentTaxMap['${warekiMap[i]}-$index']!.interestPrice.toString()),
+                              if (residentTaxMap['${warekiMap[i]}-${index + 1}']!.interestPayDate != null &&
+                                  residentTaxMap['${warekiMap[i]}-${index + 1}']!.interestPrice != null) ...<Widget>[
+                                Text(residentTaxMap['${warekiMap[i]}-${index + 1}']!.interestPayDate.toString()),
+                                Text(residentTaxMap['${warekiMap[i]}-${index + 1}']!.interestPrice.toString()),
                               ],
                             ],
                           ],

@@ -6,7 +6,7 @@ part of 'resident_tax.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$residentTaxHash() => r'b25b58503da960b8a7baa6ebf5536297216ba150';
+String _$residentTaxHash() => r'bb2849999cda628b268ea85dc746d2ae92dd20b5';
 
 /// See also [ResidentTax].
 @ProviderFor(ResidentTax)

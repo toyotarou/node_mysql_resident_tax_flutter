@@ -118,7 +118,8 @@ class _$ResidentTaxStateImpl implements _ResidentTaxState {
   const _$ResidentTaxStateImpl(
       {final List<ResidentTaxModel> residentTaxList =
           const <ResidentTaxModel>[],
-      final Map<String, ResidentTaxModel> residentTaxMap = const {}})
+      final Map<String, ResidentTaxModel> residentTaxMap =
+          const <String, ResidentTaxModel>{}})
       : _residentTaxList = residentTaxList,
         _residentTaxMap = residentTaxMap;
 
