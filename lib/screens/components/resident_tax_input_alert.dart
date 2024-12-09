@@ -137,6 +137,7 @@ class _ResidentTaxInputAlertState extends ConsumerState<ResidentTaxInputAlert> {
                 const SizedBox(height: 10),
                 TextField(
                   controller: _priceEditingController,
+                  keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
                     isDense: true,
                     contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 4),
@@ -171,6 +172,7 @@ class _ResidentTaxInputAlertState extends ConsumerState<ResidentTaxInputAlert> {
                 const SizedBox(height: 10),
                 TextField(
                   controller: _interestPriceEditingController,
+                  keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
                     isDense: true,
                     contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 4),
@@ -287,6 +289,12 @@ class _ResidentTaxInputAlertState extends ConsumerState<ResidentTaxInputAlert> {
     }
 
     final Map<String, dynamic> param = <String, dynamic>{'pay_date': payDate};
+
+    if (_priceEditingController.text == '' || _priceEditingController.text.trim().length > 6) {
+      errFlg = true;
+    }
+
+    param['price'] = _priceEditingController.text.trim();
 
     if (_interestPriceEditingController.text.trim() != '') {
       if (_interestPriceEditingController.text.trim().length > 6) {
