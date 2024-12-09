@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../controllers/resident_tax/resident_tax.dart';
 import '../../controllers/resident_tax_input/resident_tax_input.dart';
-
 import '../../extensions/extensions.dart';
 import '../../models/resident_tax_model.dart';
 import '../parts/error_dialog.dart';
@@ -38,14 +37,27 @@ class _ResidentTaxInputAlertState extends ConsumerState<ResidentTaxInputAlert> {
   void initState() {
     super.initState();
 
-    _priceEditingController.text = (widget.data?.price != null) ? widget.data!.price.toString() : '';
+    if (widget.data != null) {
+      if (widget.data!.price > 0) {
+        _priceEditingController.text = widget.data!.price.toString();
+      }
 
-    if (_priceEditingController.text == '0') {
-      _priceEditingController.text = '';
+      if (widget.data!.interestPrice != null) {
+        _interestPriceEditingController.text = widget.data!.interestPrice.toString();
+      }
+
+      if (widget.data!.payDate != null) {
+        // ignore: always_specify_types
+        Future(() => ref.read(residentTaxInputProvider.notifier).setPayDate(date: widget.data!.payDate.toString()));
+      }
+
+      if (widget.data!.interestPayDate != null) {
+        // ignore: always_specify_types
+        Future(() => ref
+            .read(residentTaxInputProvider.notifier)
+            .setInterestPayDate(date: widget.data!.interestPayDate.toString()));
+      }
     }
-
-    _interestPriceEditingController.text =
-        (widget.data?.interestPrice != null) ? widget.data!.interestPrice.toString() : '';
   }
 
   ///
@@ -67,10 +79,7 @@ class _ResidentTaxInputAlertState extends ConsumerState<ResidentTaxInputAlert> {
             Container(width: context.screenSize.width),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text('${widget.wareki}-${widget.index}'),
-                Container(),
-              ],
+              children: <Widget>[Text('${widget.wareki}-${widget.index}'), Container()],
             ),
             Divider(color: Colors.white.withOpacity(0.4), thickness: 5),
             _displayInputParts(),
@@ -80,17 +89,15 @@ class _ResidentTaxInputAlertState extends ConsumerState<ResidentTaxInputAlert> {
                 Container(),
                 if (widget.data?.price == null) ...<Widget>[
                   TextButton(
-                      onPressed: () {
-                        _inputResidentTaxRecord();
-                      },
-                      child: const Text('input')),
+                    onPressed: () => _inputResidentTaxRecord(),
+                    child: const Text('input'),
+                  ),
                 ],
                 if (widget.data?.price != null) ...<Widget>[
                   TextButton(
-                      onPressed: () {
-                        _updateResidentTaxRecord();
-                      },
-                      child: const Text('update')),
+                    onPressed: () => _updateResidentTaxRecord(),
+                    child: const Text('update'),
+                  ),
                 ],
               ],
             ),
@@ -146,21 +153,15 @@ class _ResidentTaxInputAlertState extends ConsumerState<ResidentTaxInputAlert> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     Container(),
-                    Row(
-                      children: <Widget>[
-                        const Text('limit date: '),
-                        Text(widget.payLimit),
-                      ],
-                    ),
+                    Row(children: <Widget>[const Text('limit date: '), Text(widget.payLimit)]),
                   ],
                 ),
                 Row(
                   children: <Widget>[
                     IconButton(
-                        onPressed: () {
-                          _showDP(type: 'payDate');
-                        },
-                        icon: const Icon(Icons.calendar_month)),
+                      onPressed: () => _showDP(type: 'payDate'),
+                      icon: const Icon(Icons.calendar_month),
+                    ),
                     const SizedBox(width: 10),
                     Text(payDate),
                   ],
@@ -184,10 +185,9 @@ class _ResidentTaxInputAlertState extends ConsumerState<ResidentTaxInputAlert> {
                 Row(
                   children: <Widget>[
                     IconButton(
-                        onPressed: () {
-                          _showDP(type: 'interestPayDate');
-                        },
-                        icon: const Icon(Icons.calendar_month)),
+                      onPressed: () => _showDP(type: 'interestPayDate'),
+                      icon: const Icon(Icons.calendar_month),
+                    ),
                     const SizedBox(width: 10),
                     Text(interestPayDate),
                   ],
@@ -263,12 +263,12 @@ class _ResidentTaxInputAlertState extends ConsumerState<ResidentTaxInputAlert> {
     final Map<String, dynamic> param = <String, dynamic>{
       'pay_limit': widget.payLimit,
       'period': '${widget.wareki}-${widget.index}',
-      'price': _priceEditingController.text,
+      'price': _priceEditingController.text.trim(),
     };
 
     // ignore: always_specify_types
-    ref.read(residentTaxInputProvider.notifier).inputResidentTax(param: param).then((value) {
-      ref.read(residentTaxProvider.notifier).getAllResidentTax();
+    await ref.read(residentTaxInputProvider.notifier).inputResidentTax(param: param).then((value) async {
+      await ref.read(residentTaxProvider.notifier).getAllResidentTax();
 
       if (mounted) {
         Navigator.pop(context);
@@ -277,5 +277,57 @@ class _ResidentTaxInputAlertState extends ConsumerState<ResidentTaxInputAlert> {
   }
 
   ///
-  Future<void> _updateResidentTaxRecord() async {}
+  Future<void> _updateResidentTaxRecord() async {
+    bool errFlg = false;
+
+    final String payDate = ref.watch(residentTaxInputProvider.select((ResidentTaxInputState value) => value.payDate));
+
+    if (payDate == '') {
+      errFlg = true;
+    }
+
+    final Map<String, dynamic> param = <String, dynamic>{'pay_date': payDate};
+
+    if (_interestPriceEditingController.text.trim() != '') {
+      if (_interestPriceEditingController.text.trim().length > 6) {
+        errFlg = true;
+      }
+
+      final String interestPayDate =
+          ref.watch(residentTaxInputProvider.select((ResidentTaxInputState value) => value.interestPayDate));
+
+      if (interestPayDate == '') {
+        errFlg = true;
+      }
+
+      param['interest_price'] = _interestPriceEditingController.text.trim();
+      param['interest_pay_date'] = interestPayDate;
+    }
+
+    if (errFlg) {
+      // ignore: always_specify_types
+      Future.delayed(
+        Duration.zero,
+        () => error_dialog(
+            // ignore: use_build_context_synchronously
+            context: context,
+            title: '登録できません。',
+            content: '値を正しく入力してください。'),
+      );
+
+      return;
+    }
+
+    await ref
+        .read(residentTaxInputProvider.notifier)
+        .updateResidentTax(param: param, period: '${widget.wareki}-${widget.index}')
+        // ignore: always_specify_types
+        .then((value) async {
+      await ref.read(residentTaxProvider.notifier).getAllResidentTax();
+
+      if (mounted) {
+        Navigator.pop(context);
+      }
+    });
+  }
 }

@@ -46,6 +46,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 10),
         child: Column(
           children: <Widget>[
+            const SizedBox(height: 20),
             Expanded(child: displayYearResidentTax()),
           ],
         ),
@@ -67,7 +68,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Text(i.toString()),
-              Text(warekiMap[i] ?? ''),
+              Text(
+                warekiMap[i] ?? '',
+                style: const TextStyle(color: Colors.yellowAccent),
+              ),
             ],
           ),
           Row(
@@ -125,9 +129,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: <Widget>[
                                   Container(),
-                                  Text((residentTaxMap['${warekiMap[i]}-${index + 1}']!.payDate != null)
-                                      ? residentTaxMap['${warekiMap[i]}-${index + 1}']!.payDate.toString()
-                                      : '-'),
+                                  if (residentTaxMap['${warekiMap[i]}-${index + 1}']!.payDate != null)
+                                    Text(
+                                      residentTaxMap['${warekiMap[i]}-${index + 1}']!.payDate.toString(),
+                                      style: const TextStyle(color: Colors.greenAccent),
+                                    )
+                                  else
+                                    const Text('-'),
                                 ],
                               ),
                               if (residentTaxMap['${warekiMap[i]}-${index + 1}']!.interestPayDate != null &&

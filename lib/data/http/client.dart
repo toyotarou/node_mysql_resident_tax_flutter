@@ -67,7 +67,7 @@ class HttpClient {
       if (bodyString.isEmpty) {
         throw Exception();
       }
-      return jsonDecode(bodyString);
+      return bodyString;
     } on Exception catch (_) {
       throw Exception('json parse error');
     }

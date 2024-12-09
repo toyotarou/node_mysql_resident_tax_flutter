@@ -39,4 +39,14 @@ class ResidentTaxInput extends _$ResidentTaxInput {
       utility.showError('予期せぬエラーが発生しました');
     });
   }
+
+  ///
+  Future<void> updateResidentTax({required Map<String, dynamic> param, required String period}) async {
+    final HttpClient client = ref.read(httpClientProvider);
+
+    // ignore: always_specify_types
+    await client.patch(path: 'residentTax/period/$period', body: param).then((value) {}).catchError((error, _) {
+      utility.showError('予期せぬエラーが発生しました');
+    });
+  }
 }
