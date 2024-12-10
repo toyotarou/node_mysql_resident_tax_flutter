@@ -19,7 +19,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int startYear = 2020;
-  int endYear = DateTime.now().year + 5;
+  int endYear = DateTime.now().year + 2;
 
   Map<int, String> warekiMap = <int, String>{};
 
@@ -87,6 +87,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                 final bool tapOk = DateTime.parse('$payLimit 00:00:00').isBefore(DateTime.now());
 
+                int daydiff = 0;
+
+                if (tapOk) {
+                  String payDate = '';
+
+                  if (warekiMap[i] != null &&
+                      residentTaxMap['${warekiMap[i]}-${index + 1}'] != null &&
+                      residentTaxMap['${warekiMap[i]}-${index + 1}']!.payDate != null) {
+                    payDate = residentTaxMap['${warekiMap[i]}-${index + 1}']!.payDate.toString();
+                  } else {
+                    payDate = DateTime.now().yyyymmdd;
+                  }
+
+                  daydiff = DateTime.parse('$payLimit 00:00:00').difference(DateTime.parse('$payDate 00:00:00')).inDays;
+                }
+
                 return Expanded(
                   child: GestureDetector(
                     onTap: tapOk
@@ -102,51 +118,63 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             );
                           }
                         : null,
-                    child: Container(
-                      margin: const EdgeInsets.all(2),
-                      padding: const EdgeInsets.all(2),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.white.withOpacity(0.4)),
-                        color: tapOk ? Colors.transparent : Colors.white.withOpacity(0.1),
-                      ),
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(minHeight: context.screenSize.height / 8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            const Text('limit:'),
-                            Text(payLimit),
-                            if (warekiMap[i] != null &&
-                                residentTaxMap['${warekiMap[i]}-${index + 1}'] != null) ...<Widget>[
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  Container(),
-                                  Text(residentTaxMap['${warekiMap[i]}-${index + 1}']!.price.toString().toCurrency()),
-                                ],
+                    child: Stack(
+                      children: <Widget>[
+                        Positioned(bottom: 5, right: 5, child: Text((daydiff == 0) ? '' : daydiff.toString())),
+                        Container(
+                          margin: const EdgeInsets.all(2),
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.white.withOpacity(0.4)),
+                            color: tapOk ? Colors.transparent : Colors.white.withOpacity(0.1),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              const Text('limit:'),
+                              Text(payLimit),
+                              Divider(color: Colors.white.withOpacity(0.2), thickness: 3),
+                              ConstrainedBox(
+                                constraints: BoxConstraints(minHeight: context.screenSize.height / 10),
+                                child: DefaultTextStyle(
+                                  style: const TextStyle(fontSize: 12),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: <Widget>[
+                                      Container(width: context.screenSize.width),
+                                      if (warekiMap[i] != null &&
+                                          residentTaxMap['${warekiMap[i]}-${index + 1}'] != null) ...<Widget>[
+                                        Text(
+                                          residentTaxMap['${warekiMap[i]}-${index + 1}']!.price.toString().toCurrency(),
+                                        ),
+                                        if (residentTaxMap['${warekiMap[i]}-${index + 1}']!.payDate != null)
+                                          Text(
+                                            residentTaxMap['${warekiMap[i]}-${index + 1}']!.payDate.toString(),
+                                            style: const TextStyle(color: Colors.greenAccent),
+                                          )
+                                        else
+                                          const Text('未払い', style: TextStyle(color: Colors.grey)),
+                                        if (residentTaxMap['${warekiMap[i]}-${index + 1}']!.interestPayDate != null &&
+                                            residentTaxMap['${warekiMap[i]}-${index + 1}']!.interestPrice !=
+                                                null) ...<Widget>[
+                                          Text(residentTaxMap['${warekiMap[i]}-${index + 1}']!
+                                              .interestPrice
+                                              .toString()
+                                              .toCurrency()),
+                                          Text(
+                                            residentTaxMap['${warekiMap[i]}-${index + 1}']!.interestPayDate.toString(),
+                                            style: const TextStyle(color: Colors.orangeAccent),
+                                          ),
+                                        ],
+                                      ],
+                                    ],
+                                  ),
+                                ),
                               ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  Container(),
-                                  if (residentTaxMap['${warekiMap[i]}-${index + 1}']!.payDate != null)
-                                    Text(
-                                      residentTaxMap['${warekiMap[i]}-${index + 1}']!.payDate.toString(),
-                                      style: const TextStyle(color: Colors.greenAccent),
-                                    )
-                                  else
-                                    const Text('-'),
-                                ],
-                              ),
-                              if (residentTaxMap['${warekiMap[i]}-${index + 1}']!.interestPayDate != null &&
-                                  residentTaxMap['${warekiMap[i]}-${index + 1}']!.interestPrice != null) ...<Widget>[
-                                Text(residentTaxMap['${warekiMap[i]}-${index + 1}']!.interestPayDate.toString()),
-                                Text(residentTaxMap['${warekiMap[i]}-${index + 1}']!.interestPrice.toString()),
-                              ],
                             ],
-                          ],
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ),
                 );
