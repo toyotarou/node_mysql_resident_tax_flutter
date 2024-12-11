@@ -67,7 +67,7 @@ class HttpClient {
       if (bodyString.isEmpty) {
         throw Exception();
       }
-      return bodyString;
+      return jsonDecode(bodyString);
     } on Exception catch (_) {
       throw Exception('json parse error');
     }
@@ -103,6 +103,25 @@ class HttpClient {
         throw Exception();
       }
       return jsonDecode(bodyString);
+    } on Exception catch (_) {
+      throw Exception('json parse error');
+    }
+  }
+
+  ///
+  Future<dynamic> patchReturnBodyString(
+      {required String path, Map<String, dynamic>? queryParameters, Map<String, dynamic>? body}) async {
+    final Uri uri = Uri.http(Environment.apiEndPoint, '${Environment.apiBasePath}/$path', queryParameters);
+
+    final Response response = await _client.patch(uri, headers: await _headers, body: json.encode(body));
+
+    final String bodyString = utf8.decode(response.bodyBytes);
+
+    try {
+      if (bodyString.isEmpty) {
+        throw Exception();
+      }
+      return bodyString;
     } on Exception catch (_) {
       throw Exception('json parse error');
     }

@@ -45,7 +45,7 @@ class ResidentTaxInput extends _$ResidentTaxInput {
     final HttpClient client = ref.read(httpClientProvider);
 
     // ignore: always_specify_types
-    await client.patch(path: 'residentTax/period/$period', body: param).then((value) {}).catchError((error, _) {
+    await client.patchReturnBodyString(path: 'residentTax/period/$period', body: param).then((value) {}).catchError((error, _) {
       utility.showError('予期せぬエラーが発生しました');
     });
   }
